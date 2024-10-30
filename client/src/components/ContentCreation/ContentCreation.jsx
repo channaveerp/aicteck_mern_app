@@ -370,7 +370,7 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
 
     try {
       const response = await axios.post(
-        'http://localhost:4000/api/v1/content',
+        `${import.meta.env.VITE_BACKEND_URL}/content`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },

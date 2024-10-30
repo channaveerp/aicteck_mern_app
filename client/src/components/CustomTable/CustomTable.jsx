@@ -47,14 +47,18 @@ const CustomTable = ({ headers, rows, handleClick }) => {
                           <>
                             {getMediaType(row.images) === 'Image' ? (
                               <img
-                                src={`http://localhost:4000${row?.images[0]?.path}`} // Correct access to 'path'
+                                src={`${import.meta.env.VITE_BACKEND_URL}${
+                                  row?.images?.[0]?.path || ''
+                                }`}
                                 alt={row.description}
-                                className='w-8 h-8 mr-2 rounded'
+                                className='w-8 h-8 mr-2 r ounded'
                               />
                             ) : (
                               <video className='w-8 h-8 mr-2 rounded' controls>
                                 <source
-                                  src={`http://localhost:4000${row.images[0].path}`} // Correct access to 'path'
+                                  src={`${import.meta.env.VITE_BACKEND_URL}${
+                                    row?.images?.[0]?.path || ''
+                                  }`}
                                   type='video/mp4'
                                 />
                                 Your browser does not support the video tag.

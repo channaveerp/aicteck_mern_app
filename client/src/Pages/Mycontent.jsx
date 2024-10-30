@@ -51,7 +51,7 @@ const Mycontent = () => {
     debugger;
     try {
       const response = await fetch(
-        `http://localhost:4000/api/v1/content/${updatedRow._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/content/${updatedRow._id}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ const Mycontent = () => {
 
     try {
       const res = await axios.delete(
-        `http://localhost:4000/api/v1/content/${selectedRow._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/content/${selectedRow._id}`
       );
       if (res.status === 200) {
         toast.success('Content deleted successfully!', { autoClose: 3000 });
@@ -111,7 +111,10 @@ const Mycontent = () => {
 
   const getContentData = async () => {
     try {
-      const res = await axios.get('http://localhost:4000/api/v1/content/list');
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/content/list`
+      );
+
       setListContent(res.data); // Corrected the state update to use setListContent
     } catch (error) {
       console.error('Error fetching content data:', error);
@@ -397,7 +400,10 @@ const Mycontent = () => {
                 <div className='mt-4'>
                   <div className='flex gap-2 max-w-[720px] flex-wrap overflow-scroll max-h-[350px]'>
                     {selectedRow.images?.map((mediaObj, index) => {
-                      const mediaPath = `http://localhost:4000${mediaObj.path}`;
+                      const mediaPath = `${import.meta.env.VITE_BACKEND_URL}${
+                        mediaObj.path
+                      }`;
+
                       const isVideo = mediaObj.path.endsWith('.mp4');
 
                       return (
