@@ -7,6 +7,10 @@ const cloudApikey = process.env.CLODINARY_API_KEY;
 const cloudSecretkey = process.env.CLODINARY_API_SECRET;
 console.log(cloudname, cloudSecretkey, cloudApikey);
 
+app.get('/', (req, res) => {
+  res.status(200).send('<h1>Home page</h1>');
+});
+
 app.listen(port, () => {
   console.log(`listening on port ${port} `);
 });
