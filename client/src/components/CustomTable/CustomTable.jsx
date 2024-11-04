@@ -19,9 +19,9 @@ const CustomTable = ({ headers, rows, handleClick }) => {
   };
 
   return (
-    <div className='overflow-x-auto max-h-[400px] overflow-y-scroll'>
-      <table className='min-w-full bg-white'>
-        <thead>
+    <div className='overflow-x-auto max-h-[400px] overflow-y-scroll relative'>
+      <table className='min-w-full bg-white '>
+        <thead className='sticky top-0 z-10 '>
           <tr className='w-full bg-gray-100 text-gray-700'>
             {headers.map((header, index) => (
               <th
@@ -47,18 +47,14 @@ const CustomTable = ({ headers, rows, handleClick }) => {
                           <>
                             {getMediaType(row.images) === 'Image' ? (
                               <img
-                                src={`${import.meta.env.VITE_BACKEND_URL}${
-                                  row?.images?.[0]?.path || ''
-                                }`}
+                                src={`http://localhost:4000${row?.images[0]?.path}`}
                                 alt={row.description}
-                                className='w-8 h-8 mr-2 r ounded'
+                                className='w-8 h-8 mr-2 rounded'
                               />
                             ) : (
                               <video className='w-8 h-8 mr-2 rounded' controls>
                                 <source
-                                  src={`${import.meta.env.VITE_BACKEND_URL}${
-                                    row?.images?.[0]?.path || ''
-                                  }`}
+                                  src={`http://localhost:4000${row.images[0].path}`}
                                   type='video/mp4'
                                 />
                                 Your browser does not support the video tag.
@@ -66,14 +62,15 @@ const CustomTable = ({ headers, rows, handleClick }) => {
                             )}
                           </>
                         ) : (
-                          <div className='w-8 h-8 mr-2 rounded bg-gray-200'></div> // Placeholder for no image
+                          <div className='w-8 h-8 mr-2 rounded bg-gray-200'></div>
                         )}
                         {row.description}
                       </div>
                     </div>
                   </td>
+                  {/* Display media type */}
                   <td className='px-6 py-4 text-sm text-gray-700'>
-                    {getMediaType(row.images)} {/* Display media type */}
+                    {getMediaType(row.images)}
                   </td>
                   <td className='px-6 py-4 text-sm text-gray-700'>N/A</td>
                   {/* <td className='px-6 py-4 text-sm text-gray-700'>
@@ -93,8 +90,8 @@ const CustomTable = ({ headers, rows, handleClick }) => {
                   </td>
                   <td className='px-6 py-4 text-right'>
                     <button
-                      onClick={() => handleClick(row)}
-                      className='text-gray-500 hover:text-gray-700'>
+                      className='text-gray-500 w-[20px] hover:text-gray-700 '
+                      onClick={() => handleClick(row)}>
                       ⋮
                     </button>
                   </td>

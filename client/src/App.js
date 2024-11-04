@@ -1,7 +1,7 @@
 import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
 import Navbar from './components/Navbar/Navbar';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Home from './Pages/Dashboard';
 import Mycontent from './Pages/Mycontent';
 import Template from './Pages/Template';
@@ -22,7 +22,8 @@ function App() {
       {/* content */}
       <div className='content'>
         <Routes>
-          <Route element={<Dashboard />} path='/' />
+          {/* <Route element={<Dashboard />} path='/' /> */}
+          <Route element={<Navigate to='/content/my-content' />} path='/' />
           <Route element={<Mycontent />} path='/content/my-content' />
           <Route element={<Template />} path='/content/templates' />
           <Route element={<Playlist />} path='/content/playlist' />

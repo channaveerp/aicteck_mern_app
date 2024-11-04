@@ -1,53 +1,100 @@
+import 'dotenv/config';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { content } from '../models/contentSchema.js';
+import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
+import { storage } from '../config/firebaseConfig.js';
 
-// Get current file path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadDir = path.join(__dirname, '../uploads');
+// // Get current file path
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+// const uploadDir = path.join(__dirname, '../uploads');
 
-// Create uploads directory if it doesn't exist
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// // Create uploads directory if it doesn't exist
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir, { recursive: true });
+// }
 
-// Configure multer storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+// // Configure multer storage
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, uploadDir);
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, `${Date.now()}-${file.originalname}`);
+//   },
+// });
 
-// Filter for file types (allow images and videos)
-const fileFilter = (req, file, cb) => {
-  const imageTypes = /image\/(jpeg|jpg|png|gif)/; // Allowed image MIME types
-  const videoTypes = /video\/(mp4|avi|mov)/; // Allowed video MIME types
+// // Filter for file types (allow images and videos)
+// const fileFilter = (req, file, cb) => {
+//   const imageTypes = /image\/(jpeg|jpg|png|gif)/; // Allowed image MIME types
+//   const videoTypes = /video\/(mp4|avi|mov)/; // Allowed video MIME types
 
-  if (imageTypes.test(file.mimetype) || videoTypes.test(file.mimetype)) {
-    cb(null, true); // Accept the file
-  } else {
-    cb(new Error('Only image and video files are allowed!'), false); // Reject the file
-  }
-};
+//   if (imageTypes.test(file.mimetype) || videoTypes.test(file.mimetype)) {
+//     cb(null, true); // Accept the file
+//   } else {
+//     cb(new Error('Only image and video files are allowed!'), false); // Reject the file
+//   }
+// };
 
-const upload = multer({ storage, fileFilter });
+// const upload = multer({ storage, fileFilter });
 
+// const createContent = async (req, res) => {
+//   try {
+//     const { mediaTags, description, orientation } = req.body;
+
+//     // Extract file paths and sizes from uploaded files
+//     const images = req.files.map((file) => ({
+//       path: `/uploads/${file.filename}`,
+//       size: file.size, // Size in bytes
+//     }));
+
+//     const newContent = new content({
+//       mediaTags: mediaTags.split(',').map((tag) => tag.trim()),
+//       description,
+//       orientation,
+//       images,
+//     });
+
+//     await newContent.save();
+//     res
+//       .status(201)
+//       .json({ message: 'Content created successfully', content: newContent });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// List controller
+const upload = multer({ storage: multer.memoryStorage() });
 const createContent = async (req, res) => {
   try {
     const { mediaTags, description, orientation } = req.body;
+    const images = [];
 
-    // Extract file paths and sizes from uploaded files
-    const images = req.files.map((file) => ({
-      path: `/uploads/${file.filename}`,
-      size: file.size, // Size in bytes
-    }));
+    for (const file of req.files) {
+      // Create a reference to the Firebase storage location
+      const storageRef = ref(
+        storage,
+        `uploads/${Date.now()}-${file.originalname}`
+      );
 
+      // Upload the file to Firebase Storage
+      const snapshot = await uploadBytes(storageRef, file.buffer);
+
+      // Get the public download URL
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Save the URL and file size to your images array
+      images.push({
+        path: downloadURL, // URL from Firebase
+        size: file.size, // File size
+      });
+    }
+
+    // Create new content document with image URLs from Firebase Storage
     const newContent = new content({
       mediaTags: mediaTags.split(',').map((tag) => tag.trim()),
       description,
@@ -64,7 +111,6 @@ const createContent = async (req, res) => {
   }
 };
 
-// List controller
 const listContent = async (req, res) => {
   try {
     const contents = await content.find();
