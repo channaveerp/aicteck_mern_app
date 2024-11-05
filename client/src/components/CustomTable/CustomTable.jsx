@@ -19,14 +19,20 @@ const CustomTable = ({ headers, rows, handleClick }) => {
   };
 
   return (
-    <div className='overflow-x-auto max-h-[400px] overflow-y-scroll relative'>
-      <table className='min-w-full bg-white '>
+    <div
+      className='overflow-x-auto max-h-[400px] overflow-y-scroll relative border-[]'
+      style={{
+        border: '0.25px solid #9EA3A9',
+        borderRadius: '5px',
+        maxWidth: '97%',
+      }}>
+      <table className='min-w-full bg-[#FFFFFF] '>
         <thead className='sticky top-0 z-10 '>
-          <tr className='w-full bg-gray-100 text-gray-700'>
+          <tr className='w-full  text-[#212B36]'>
             {headers.map((header, index) => (
               <th
                 key={index}
-                className='px-6 py-3 text-left text-sm font-medium'>
+                className='px-6 py-3 text-left text-[13px] font-[500]'>
                 {header}
               </th>
             ))}
@@ -36,7 +42,7 @@ const CustomTable = ({ headers, rows, handleClick }) => {
           {rows?.length > 0 ? (
             <>
               {rows.map((row, rowIndex) => (
-                <tr key={rowIndex} className='border-b border-gray-200'>
+                <tr key={rowIndex} className='border-b '>
                   <td className='px-6 py-4 text-sm text-gray-700'>
                     {rowIndex + 1}
                   </td>
@@ -62,35 +68,35 @@ const CustomTable = ({ headers, rows, handleClick }) => {
                             )}
                           </>
                         ) : (
-                          <div className='w-8 h-8 mr-2 rounded bg-gray-200'></div>
+                          <div className='w-8 h-8 mr-2 rounded text-[#212B36]'></div>
                         )}
                         {row.description}
                       </div>
                     </div>
                   </td>
                   {/* Display media type */}
-                  <td className='px-6 py-4 text-sm text-gray-700'>
+                  <td className='px-6 py-4 text-sm text-[#212B36]'>
                     {getMediaType(row.images)}
                   </td>
-                  <td className='px-6 py-4 text-sm text-gray-700'>N/A</td>
+                  <td className='px-6 py-4 text-sm text-[#212B36]'>N/A</td>
                   {/* <td className='px-6 py-4 text-sm text-gray-700'>
                     {row?.images && row?.images?.length > 0
                       ? `${(row?.images[0]?.size / 1024).toFixed(2)} KB` // Access 'size'
                       : 'N/A'}
                   </td> */}
-                  <td className='px-6 py-4 text-sm text-gray-700'>
+                  <td className='px-6 py-4 text-sm text-[#212B36]'>
                     {row.createdAt
                       ? new Date(row?.createdAt).toLocaleString()
                       : 'N/A'}
                   </td>
-                  <td className='px-6 py-4 text-sm text-gray-700'>
+                  <td className='px-6 py-4 text-sm text-[#212B36]'>
                     {row?.images && row?.images?.length > 0
                       ? `${(row?.images[0]?.size / 1024).toFixed(2)} KB`
                       : 'N/A'}
                   </td>
                   <td className='px-6 py-4 text-right'>
                     <button
-                      className='text-gray-500 w-[20px] hover:text-gray-700 '
+                      className='text-gray-500 w-[20px] hover:text-gray-700  '
                       onClick={() => handleClick(row)}>
                       ⋮
                     </button>

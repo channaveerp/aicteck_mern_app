@@ -16,9 +16,11 @@ import StorageComponent from '../components/Storage/Storage';
 import ContentCreation from '../components/ContentCreation/ContentCreation';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { GrNext, GrPrevious } from 'react-icons/gr';
 
 const Mycontent = () => {
   const [listContent, setListContent] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const totalStorage = 5120; // 5GB in MB
   const [usedStorage, setUsedStorage] = useState(90); // Initial storage usage in MB
 
@@ -30,8 +32,8 @@ const Mycontent = () => {
 
   const handleOpenModal = (row) => {
     setSelectedRow(row);
-    // setIsModalOpen(true);
-    setEditModalOpen(true);
+    setIsModalOpen(true);
+    // setEditModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -176,6 +178,26 @@ const Mycontent = () => {
       });
     }
   };
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0); // New state for tracking current media index
+
+  // ... other functions
+
+  const handleNext = () => {
+    if (
+      selectedRow?.images &&
+      currentMediaIndex < selectedRow.images.length - 1
+    ) {
+      setCurrentMediaIndex(currentMediaIndex + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentMediaIndex > 0) {
+      setCurrentMediaIndex(currentMediaIndex - 1);
+    }
+  };
+
+  const images = selectedRow?.images;
 
   return (
     <>
@@ -192,8 +214,53 @@ const Mycontent = () => {
       )}
       {editModalOpen && (
         <CustomModal isOpen={editModalOpen} onClose={closeEditModal}>
-          <div className='min-w-[720px]'>
+          <div className='min-w-[720px] max-h-[500px] overflow-y-scroll'>
             <h2 className='text-xl font-semibold'>Edit Content</h2>
+
+            <div className='mb-4 p-2'>
+              <div className='relative'>
+                {images[currentImageIndex] &&
+                images[currentImageIndex].path.endsWith('.mp4') ? (
+                  <video
+                    src={images[currentImageIndex].path}
+                    className='w-full h-64 rounded-[12px]'
+                    controls
+                  />
+                ) : (
+                  <img
+                    src={images[currentImageIndex].path}
+                    alt='Preview'
+                    className='w-full h-64 object-cover rounded-[12px]'
+                  />
+                )}
+
+                <div className='absolute top-1/2 left-0 right-0 flex justify-between'>
+                  {images?.length > 1 && (
+                    <button
+                      className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                      onClick={() =>
+                        setCurrentImageIndex((prev) =>
+                          prev === 0 ? images.length - 1 : prev - 1
+                        )
+                      }>
+                      <GrPrevious />
+                    </button>
+                  )}
+
+                  {images?.length > 1 && (
+                    <button
+                      className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                      onClick={() =>
+                        setCurrentImageIndex(
+                          (prev) => (prev + 1) % images.length
+                        )
+                      }>
+                      <GrNext />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Description Textarea */}
             <strong>Description</strong>
@@ -246,7 +313,7 @@ const Mycontent = () => {
             )}
 
             {/* Image Slider with Delete Button */}
-            <strong>Images</strong>
+            {/* <strong>Images</strong>
             <div className='flex mt-4 overflow-x-auto space-x-4'>
               {selectedRow?.images?.map((image, index) => (
                 <div key={image._id} className='relative'>
@@ -262,15 +329,21 @@ const Mycontent = () => {
                   </button>
                 </div>
               ))}
-            </div>
+            </div> */}
 
             {/* Update Button */}
-            <button
-              type='button'
-              onClick={() => updateContent(selectedRow)}
-              className='bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 mt-4'>
-              {loading ? 'Loading...' : 'Update'}
-            </button>
+            <div className='flex justify-end mt-4 mb-4'>
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className='bg-gray-200 px-4 py-2 rounded-lg mr-2'>
+                Back
+              </button>
+              <button
+                onClick={() => updateContent(selectedRow)}
+                className='bg-green-600 text-white px-4 py-2 rounded-lg'>
+                {loading ? 'Loading...' : 'Update'}
+              </button>
+            </div>
           </div>
         </CustomModal>
       )}
@@ -281,7 +354,7 @@ const Mycontent = () => {
           <button
             onClick={handleCreateNewContent}
             type='button'
-            className='mr-[50px] focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5'>
+            className='mr-[50px] focus:outline-none text-white bg-[#30A84B] hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5'>
             New Content
           </button>
         </div>
@@ -370,10 +443,10 @@ const Mycontent = () => {
                     </button>
                   </div>
                 </div>
-                <div className='mt-4'>
+                {/* <div className='mt-4'>
                   <div className='flex gap-2 max-w-[720px] flex-wrap overflow-scroll max-h-[350px]'>
                     {selectedRow.images?.map((mediaObj, index) => {
-                      const mediaPath = `http://localhost:4000${mediaObj.path}`;
+                      const mediaPath = `http://localhost:4000/${mediaObj.path}`;
                       const isVideo = mediaObj.path.endsWith('.mp4');
 
                       return (
@@ -396,7 +469,7 @@ const Mycontent = () => {
                       );
                     })}
                   </div>
-                </div>
+                </div> */}
               </div>
             ) : null}
           </CustomModal>
