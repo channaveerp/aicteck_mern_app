@@ -17,10 +17,13 @@ import ContentCreation from '../components/ContentCreation/ContentCreation';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { GrNext, GrPrevious } from 'react-icons/gr';
+import EditModal from '../components/EditModal/EditModal';
 
 const Mycontent = () => {
   const [listContent, setListContent] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  console.log('current image index: ' + currentImageIndex);
+
   const totalStorage = 5120; // 5GB in MB
   const [usedStorage, setUsedStorage] = useState(90); // Initial storage usage in MB
 
@@ -56,7 +59,7 @@ const Mycontent = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}content/${updatedRow._id}`,
+        `https://aicteck-mern-app.onrender.com/api/v1/content/${updatedRow._id}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -90,7 +93,7 @@ const Mycontent = () => {
 
     try {
       const res = await axios.delete(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}content/${selectedRow._id}`
+        `https://aicteck-mern-app.onrender.com/api/v1/content/${selectedRow._id}`
       );
       if (res.status === 200) {
         toast.success('Content deleted successfully!', { autoClose: 3000 });
@@ -125,7 +128,7 @@ const Mycontent = () => {
     try {
       // const res = await axios.get(`${process.env.LOCAL_BASE_URL}content/list`);
       const res = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}content/list`
+        `https://aicteck-mern-app.onrender.com/api/v1/content/list`
       );
       setListContent(res.data); // Corrected the state update to use setListContent
     } catch (error) {
@@ -162,10 +165,11 @@ const Mycontent = () => {
   const tagsToDisplay = cleanMediaTags(selectedRow?.mediaTags);
 
   console.log('selected content', selectedRow);
+  
   const deleteImage = async (imageId) => {
     try {
       const res = await axios.delete(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}content/${imageId}`
+        `https://aicteck-mern-app.onrender.com/api/v1/content/${imageId}`
       );
       if (res.status === 200) {
         toast.success('Media deleted successfully!', { autoClose: 3000 });
@@ -235,29 +239,23 @@ const Mycontent = () => {
                 )}
 
                 <div className='absolute top-1/2 left-0 right-0 flex justify-between'>
-                  {images?.length > 1 && (
-                    <button
-                      className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
-                      onClick={() =>
-                        setCurrentImageIndex((prev) =>
-                          prev === 0 ? images.length - 1 : prev - 1
-                        )
-                      }>
-                      <GrPrevious />
-                    </button>
-                  )}
+                  <button
+                    className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                    onClick={() =>
+                      setCurrentImageIndex((prev) =>
+                        prev === 0 ? images.length - 1 : prev - 1
+                      )
+                    }>
+                    <GrPrevious />
+                  </button>
 
-                  {images?.length > 1 && (
-                    <button
-                      className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
-                      onClick={() =>
-                        setCurrentImageIndex(
-                          (prev) => (prev + 1) % images.length
-                        )
-                      }>
-                      <GrNext />
-                    </button>
-                  )}
+                  <button
+                    className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                    onClick={() =>
+                      setCurrentImageIndex((prev) => (prev + 1) % images.length)
+                    }>
+                    <GrNext />
+                  </button>
                 </div>
               </div>
             </div>
@@ -394,56 +392,56 @@ const Mycontent = () => {
             <img src={list} alt='list' className='w-[30px] h-[30px]' />
           </div>
         </div>
-
-        <CustomTable
-          headers={headers}
-          rows={listContent}
-          handleClick={handleOpenModal}
-        />
-
-        {/* Details Modal */}
-        {isModalOpen && (
-          <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
-            {selectedRow ? (
-              <div className='min-w-[720px]'>
-                <h2 className='text-xl font-semibold'>Content Details</h2>
-                <div className='border-2 p-4 rounded-lg flex items-start justify-between'>
-                  <div className='flex flex-col'>
-                    <div className='inline'>
-                      <strong>Description:</strong> {selectedRow.description}
+        <div className='relative'>
+          <CustomTable
+            headers={headers}
+            rows={listContent}
+            handleClick={handleOpenModal}
+          />{' '}
+          {isModalOpen && (
+            <EditModal isOpen={isModalOpen} onClose={handleCloseModal}>
+              {selectedRow ? (
+                <div className='min-w-[720px]'>
+                  {/* <h2 className='text-xl font-semibold'>Content Details</h2> */}
+                  <div className=' p-4 rounded-lg flex items-start justify-between'>
+                    <div className='flex flex-col'>
+                      <div className='inline'>
+                        <strong>Description:</strong> {selectedRow.description}
+                      </div>
+                      <div className='inline'>
+                        <strong>Orientation:</strong> {selectedRow.orientation}
+                      </div>
+                      <div className='inline'>
+                        <strong>Size:</strong>{' '}
+                        {(
+                          selectedRow.images.reduce(
+                            (total, img) => total + img.size,
+                            0
+                          ) / 1024
+                        ).toFixed(2)}{' '}
+                        KB
+                      </div>
+                      <div className='inline'>
+                        <strong>Tags:</strong>{' '}
+                        {parseMediaTags(selectedRow.mediaTags).join(', ')}
+                      </div>
                     </div>
-                    <div className='inline'>
-                      <strong>Orientation:</strong> {selectedRow.orientation}
-                    </div>
-                    <div className='inline'>
-                      <strong>Size:</strong>{' '}
-                      {(
-                        selectedRow.images.reduce(
-                          (total, img) => total + img.size,
-                          0
-                        ) / 1024
-                      ).toFixed(2)}{' '}
-                      KB
-                    </div>
-                    <div className='inline'>
-                      <strong>Tags:</strong>{' '}
-                      {parseMediaTags(selectedRow.mediaTags).join(', ')}
+                    <div className='flex  items-center gap-4 justify-center pr-16'>
+                      <button
+                        onClick={openEditModal}
+                        className='text-[black] font-medium'>
+                        <img src={edit} alt='edit' />
+                        {/* Edit */}
+                      </button>
+                      <button
+                        onClick={handleDelete}
+                        className='text-[black]  font-medium'>
+                        <img src={delete1} alt='delete' />
+                        {/* Delete */}
+                      </button>
                     </div>
                   </div>
-                  <div className='flex space-x-4'>
-                    <button
-                      onClick={openEditModal}
-                      className='text-blue-500 hover:text-blue-700'>
-                      <img src={edit} alt='edit' />
-                    </button>
-                    <button
-                      onClick={handleDelete}
-                      className='text-red-500 hover:text-red-700'>
-                      <img src={delete1} alt='delete' />
-                    </button>
-                  </div>
-                </div>
-                {/* <div className='mt-4'>
+                  {/* <div className='mt-4'>
                   <div className='flex gap-2 max-w-[720px] flex-wrap overflow-scroll max-h-[350px]'>
                     {selectedRow.images?.map((mediaObj, index) => {
                       const mediaPath = `http://localhost:4000/${mediaObj.path}`;
@@ -470,10 +468,13 @@ const Mycontent = () => {
                     })}
                   </div>
                 </div> */}
-              </div>
-            ) : null}
-          </CustomModal>
-        )}
+                </div>
+              ) : null}
+            </EditModal>
+          )}
+        </div>
+
+        {/* Details Modal */}
       </div>
     </>
   );

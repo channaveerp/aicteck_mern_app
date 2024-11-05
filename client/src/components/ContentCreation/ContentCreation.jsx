@@ -74,14 +74,14 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}content`,
+        `https://aicteck-mern-app.onrender.com/api/v1/content`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
         }
       );
 
-      toast.success('Upload successful!');
+      // toast.success('Upload successful!');
       onUpload(response.data);
     } catch (error) {
       toast.error('Error uploading data');
@@ -206,6 +206,10 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
               <div>
                 {mediaFiles.map((file, index) => (
                   <div
+                    style={{
+                      border: '0.5px solid #CED0D3',
+                      borderRadius: '6px',
+                    }}
                     key={index}
                     className='flex items-center mb-2 border-2 rounded-sm px-2 py-2 justify-between'>
                     <div className='flex'>
@@ -244,7 +248,7 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
 
                     <div>
                       <button
-                        className='mr-2'
+                        className='mr-4'
                         onClick={() =>
                           handleEditFileName(
                             index,
@@ -298,7 +302,7 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
               )}
               <div className='absolute top-1/2 left-0 right-0 flex justify-between'>
                 <button
-                  className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                  className='bg-red-100 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
                   onClick={() =>
                     setCurrentImageIndex((prev) =>
                       prev === 0 ? mediaFiles.length - 1 : prev - 1
@@ -307,7 +311,7 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
                   <GrPrevious />
                 </button>
                 <button
-                  className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                  className='bg-red-100 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
                   onClick={() =>
                     setCurrentImageIndex(
                       (prev) => (prev + 1) % mediaFiles.length

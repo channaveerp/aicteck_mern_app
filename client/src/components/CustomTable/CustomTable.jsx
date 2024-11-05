@@ -2,17 +2,21 @@ import React from 'react';
 
 const CustomTable = ({ headers, rows, handleClick }) => {
   const getMediaType = (media) => {
-    if (!media || media?.length === 0) {
+    if (!media || media.length === 0) {
       return 'Video'; // Default if no media
     }
-    console.log('rows', rows);
-    const firstMediaPath = media[0]?.path; // Access the 'path' property
-    const extension = firstMediaPath?.split('.')?.pop()?.toLowerCase();
+
+    const firstMediaPath = media[0]?.path;
+    const extension = firstMediaPath
+      ?.split('?')[0]
+      ?.split('.')
+      .pop()
+      ?.toLowerCase(); // Splits at '?' to handle URLs with tokens
 
     // Determine media type based on the extension
-    if (['jpg', 'jpeg', 'png', 'gif']?.includes(extension)) {
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
       return 'Image';
-    } else if (['mp4', 'avi', 'mov']?.includes(extension)) {
+    } else if (['mp4', 'avi', 'mov'].includes(extension)) {
       return 'Video';
     }
     return 'Unknown';
@@ -27,7 +31,7 @@ const CustomTable = ({ headers, rows, handleClick }) => {
         maxWidth: '97%',
       }}>
       <table className='min-w-full bg-[#FFFFFF] '>
-        <thead className='sticky top-0 z-10 '>
+        <thead className='sticky top-0 z-20 '>
           <tr className='w-full  text-[#212B36]'>
             {headers.map((header, index) => (
               <th
@@ -53,14 +57,14 @@ const CustomTable = ({ headers, rows, handleClick }) => {
                           <>
                             {getMediaType(row.images) === 'Image' ? (
                               <img
-                                src={`http://localhost:4000${row?.images[0]?.path}`}
+                                src={`${row?.images[0]?.path}`}
                                 alt={row.description}
                                 className='w-8 h-8 mr-2 rounded'
                               />
                             ) : (
                               <video className='w-8 h-8 mr-2 rounded' controls>
                                 <source
-                                  src={`http://localhost:4000${row.images[0].path}`}
+                                  src={`${row.images[0].path}`}
                                   type='video/mp4'
                                 />
                                 Your browser does not support the video tag.
@@ -80,10 +84,10 @@ const CustomTable = ({ headers, rows, handleClick }) => {
                   </td>
                   <td className='px-6 py-4 text-sm text-[#212B36]'>N/A</td>
                   {/* <td className='px-6 py-4 text-sm text-gray-700'>
-                    {row?.images && row?.images?.length > 0
-                      ? `${(row?.images[0]?.size / 1024).toFixed(2)} KB` // Access 'size'
-                      : 'N/A'}
-                  </td> */}
+                      {row?.images && row?.images?.length > 0
+                        ? `${(row?.images[0]?.size / 1024).toFixed(2)} KB` // Access 'size'
+                        : 'N/A'}
+                    </td> */}
                   <td className='px-6 py-4 text-sm text-[#212B36]'>
                     {row.createdAt
                       ? new Date(row?.createdAt).toLocaleString()
