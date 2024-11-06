@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import delete1 from '../../assets/delete.svg';
 import editIcon from '../../assets/editIcon.svg';
 import LoadingSpinner from '../Loading/LoadingSpinner';
+import Slider from 'react-slick';
 
 const ContentCreation = ({ onClose, onUpload, initialData }) => {
   const [step, setStep] = useState(1);
@@ -13,6 +14,8 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
   const [contentDescription, setContentDescription] = useState(
     initialData?.description || ''
   );
+  console.log('mediafiles', mediaFiles);
+
   const [orientation, setOrientation] = useState(
     initialData?.orientation || 'Fit to screen'
   );
@@ -109,6 +112,32 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
       }
     );
     setMediaFiles(updatedMediaFiles);
+  };
+
+  const settings = {
+    infinite: true, // Enable infinite loop for circular navigation
+    speed: 500, // Transition speed
+    slidesToShow: 1, // Show 1 item at a time
+    slidesToScroll: 1, // Scroll 1 item at a time
+    nextArrow: <GrNext />,
+    prevArrow: <GrPrevious />,
+    beforeChange: (current, next) => setCurrentImageIndex(next), // Update the index on change
+  };
+  const handleDelete = (index) => {
+    const updatedMediaFiles = mediaFiles.filter((_, i) => i !== index);
+    setMediaFiles(updatedMediaFiles || []);
+    // Adjust the currentImageIndex if the deleted image was the currently viewed image
+    if (currentImageIndex >= updatedMediaFiles.length) {
+      setCurrentImageIndex(updatedMediaFiles.length - 1); // reset to last image if current index is out of bounds
+    }
+  };
+  const createObjectURLSafely = (file) => {
+    if (file instanceof File || file instanceof Blob) {
+      return URL.createObjectURL(file);
+    } else {
+      console.error('Invalid file type:', file);
+      return '';
+    }
   };
 
   return (
@@ -288,7 +317,8 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
         <>
           <div className='mb-4'>
             <div className='relative'>
-              {mediaFiles[currentImageIndex].type.startsWith('video/') ? (
+              {mediaFiles.length > 0 &&
+              mediaFiles[currentImageIndex].type.startsWith('video/') ? (
                 <video
                   src={URL.createObjectURL(mediaFiles[currentImageIndex])}
                   className='w-full h-64 rounded-[12px]'
@@ -301,30 +331,42 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
                   className='w-full h-64 object-cover rounded-[12px]'
                 />
               )}
+              {/* <button
+                onClick={() => handleDelete(currentImageIndex)}
+                className='absolute top-3 right-3 bg-[#FAFAFAE5] p-3 rounded-[50%] '>
+                <img src={delete1} alt='delete' />
+              </button> */}
+              <span className='absolute bottom-4 left-2 w-[66px] h-[36px] flex justify-center items-center bg-[#00000080] text-center rounded-[25px] text-white font-medium '>
+                {currentImageIndex}/{mediaFiles.length}
+              </span>
               <div className='absolute top-1/2 left-0 right-0 flex justify-between'>
-                <button
-                  className='bg-red-100 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
-                  onClick={() =>
-                    setCurrentImageIndex((prev) =>
-                      prev === 0 ? mediaFiles.length - 1 : prev - 1
-                    )
-                  }>
-                  <GrPrevious />
-                </button>
-                <button
-                  className='bg-red-100 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
-                  onClick={() =>
-                    setCurrentImageIndex(
-                      (prev) => (prev + 1) % mediaFiles.length
-                    )
-                  }>
-                  <GrNext />
-                </button>
+                {mediaFiles.length > 2 && (
+                  <>
+                    <button
+                      className='bg-red-100 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                      onClick={() =>
+                        setCurrentImageIndex((prev) =>
+                          prev === 0 ? mediaFiles.length - 1 : prev - 1
+                        )
+                      }>
+                      <GrPrevious />
+                    </button>
+                    <button
+                      className='bg-red-100 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                      onClick={() =>
+                        setCurrentImageIndex(
+                          (prev) => (prev + 1) % mediaFiles.length
+                        )
+                      }>
+                      <GrNext />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
 
-          <div className='mb-4'>
+          <div className='mb-4 '>
             <label className='block text-sm font-medium mb-1'>Media Tags</label>
             <input
               type='text'

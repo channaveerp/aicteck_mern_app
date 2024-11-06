@@ -73,3 +73,19 @@
 .nodatafound {
   transform: translate(-50%, -50%);
 }
+.slick-next {
+  color: black !important;
+}
+/* onhover none */
+.slick-next:hover {
+  color: black !important;
+}
+.slick-prev {
+  color: black !important;
+}
+.slick-prev:hover {
+  color: black !important;
+}
+.slick-slide {
+  overflow: hidden;
+}

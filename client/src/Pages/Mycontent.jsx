@@ -170,6 +170,25 @@ const Mycontent = () => {
   console.log('selected content', selectedRow);
 
   const images = selectedRow?.images;
+  useEffect(() => {
+    if (images?.length > 0 && currentImageIndex >= images.length) {
+      setCurrentImageIndex(0); // Reset if index is out of range
+    }
+  }, [images, currentImageIndex]);
+  // Define these functions at the top of your component
+  const goToPreviousImage = () => {
+    setCurrentImageIndex((prevIndex) => {
+      const newIndex = prevIndex === 0 ? images.length - 1 : prevIndex - 1;
+      return newIndex;
+    });
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prevIndex) => {
+      const newIndex = prevIndex === images.length - 1 ? 0 : prevIndex + 1;
+      return newIndex;
+    });
+  };
 
   return (
     <>
@@ -187,44 +206,46 @@ const Mycontent = () => {
       {editModalOpen && (
         <CustomModal isOpen={editModalOpen} onClose={closeEditModal}>
           <div className='min-w-[720px] max-h-[500px] overflow-y-scroll'>
-            <h2 className='text-xl font-semibold'>Edit Content</h2>
+            <h2 className='text-xl font-semibold'>Edit Conten</h2>
 
             <div className='mb-4 p-2'>
               <div className='relative'>
                 {images[currentImageIndex] &&
-                images[currentImageIndex].path.endsWith('.mp4') ? (
-                  <video
-                    src={images[currentImageIndex].path}
-                    className='w-full h-64 rounded-[12px]'
-                    controls
-                  />
-                ) : (
-                  <img
-                    src={images[currentImageIndex].path}
-                    alt='Preview'
-                    className='w-full h-64 object-cover rounded-[12px]'
-                  />
+                  (images[currentImageIndex].path.endsWith('.mp4') ? (
+                    <video
+                      src={images[currentImageIndex].path}
+                      className='w-full h-64 rounded-[12px]'
+                      controls
+                      key={images[currentImageIndex].path}
+                    />
+                  ) : (
+                    <img
+                      src={images[currentImageIndex].path}
+                      alt='Preview'
+                      className='w-full h-64 object-cover rounded-[12px]'
+                      key={images[currentImageIndex].path}
+                    />
+                  ))}
+                {images.length > 2 && (
+                  <div className='absolute top-1/2 left-0 right-0 flex justify-between'>
+                    <button
+                      className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                      onClick={goToPreviousImage}>
+                      <GrPrevious />
+                    </button>
+
+                    <button
+                      className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
+                      onClick={goToNextImage}>
+                      <GrNext />
+                    </button>
+                  </div>
                 )}
-
-                <div className='absolute top-1/2 left-0 right-0 flex justify-between'>
-                  <button
-                    className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
-                    onClick={() =>
-                      setCurrentImageIndex((prev) =>
-                        prev === 0 ? images.length - 1 : prev - 1
-                      )
-                    }>
-                    <GrPrevious />
-                  </button>
-
-                  <button
-                    className='bg-red-300 w-[50px] h-[50px] rounded-[50%] text-center flex items-center justify-center'
-                    onClick={() =>
-                      setCurrentImageIndex((prev) => (prev + 1) % images.length)
-                    }>
-                    <GrNext />
-                  </button>
-                </div>
+                {images.length > 1 && (
+                  <span className='absolute bottom-4 left-2 w-[66px] h-[36px] flex justify-center items-center bg-[#00000080] text-center rounded-[25px] text-white font-medium '>
+                    {currentImageIndex}/{images.length}
+                  </span>
+                )}
               </div>
             </div>
 
