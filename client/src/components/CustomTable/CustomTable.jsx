@@ -30,7 +30,7 @@ const CustomTable = ({ headers, rows, handleClick }) => {
         borderRadius: '5px',
         maxWidth: '97%',
       }}>
-      <table className='min-w-full bg-[#FFFFFF] '>
+      <table className='min-w-full bg-[#FFFFFF] min-h-[200px]'>
         <thead className='sticky top-0 z-20 '>
           <tr className='w-full  text-[#212B36]'>
             {headers.map((header, index) => (
@@ -109,7 +109,7 @@ const CustomTable = ({ headers, rows, handleClick }) => {
               ))}
             </>
           ) : (
-            <div className='absolute top-[70%] left-[60%] translate-x-[-50%] translate-y-[-50%]'>
+            <div className='absolute top-[50%] left-[50%] nodatafound'>
               No data found
             </div>
           )}

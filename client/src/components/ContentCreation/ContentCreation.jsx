@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import delete1 from '../../assets/delete.svg';
 import editIcon from '../../assets/editIcon.svg';
+import LoadingSpinner from '../Loading/LoadingSpinner';
 
 const ContentCreation = ({ onClose, onUpload, initialData }) => {
   const [step, setStep] = useState(1);
@@ -74,7 +75,7 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
 
     try {
       const response = await axios.post(
-        `https://aicteck-mern-app.onrender.com/api/v1/content`,
+        `${process.env.REACT_APP_BACKEND_URL}content`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -364,8 +365,12 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
 
           <div className='flex justify-end'>
             <button
+              disabled={loading}
+              style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
               onClick={() => setStep(step - 1)}
-              className='bg-gray-200 px-4 py-2 rounded-lg mr-2'>
+              className={`bg-gray-200 px-4 py-2 rounded-lg mr-2 ${
+                loading ? 'cursor-not-allowed opacity-70' : ''
+              }`}>
               Back
             </button>
             <button
@@ -374,7 +379,7 @@ const ContentCreation = ({ onClose, onUpload, initialData }) => {
                 loading ? 'cursor-not-allowed opacity-70' : ''
               }`}
               disabled={loading}>
-              {loading ? 'Loading...' : 'Upload'}
+              {loading ? <LoadingSpinner /> : 'Upload'}
             </button>
           </div>
         </>

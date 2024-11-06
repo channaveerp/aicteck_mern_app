@@ -18,6 +18,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { GrNext, GrPrevious } from 'react-icons/gr';
 import EditModal from '../components/EditModal/EditModal';
+import LoadingSpinner from '../components/Loading/LoadingSpinner';
 
 const Mycontent = () => {
   const [listContent, setListContent] = useState([]);
@@ -59,7 +60,7 @@ const Mycontent = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://aicteck-mern-app.onrender.com/api/v1/content/${updatedRow._id}`,
+        `${process.env.REACT_APP_BACKEND_URL}content/${updatedRow._id}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -90,18 +91,20 @@ const Mycontent = () => {
     );
 
     if (!confirmation) return;
-
+    setLoading(true);
     try {
       const res = await axios.delete(
-        `https://aicteck-mern-app.onrender.com/api/v1/content/${selectedRow._id}`
+        `${process.env.REACT_APP_BACKEND_URL}content/${selectedRow._id}`
       );
       if (res.status === 200) {
         toast.success('Content deleted successfully!', { autoClose: 3000 });
         getContentData(); // Refresh content list
         setIsModalOpen(false);
+        setLoading(false);
         setSelectedRow(null);
       }
     } catch (error) {
+      setLoading(false);
       console.error('Error deleting content:', error);
       toast.error('Failed to delete content. Please try again.', {
         autoClose: 3000,
@@ -128,7 +131,7 @@ const Mycontent = () => {
     try {
       // const res = await axios.get(`${process.env.LOCAL_BASE_URL}content/list`);
       const res = await axios.get(
-        `https://aicteck-mern-app.onrender.com/api/v1/content/list`
+        `${process.env.REACT_APP_BACKEND_URL}content/list`
       );
       setListContent(res.data); // Corrected the state update to use setListContent
     } catch (error) {
@@ -165,41 +168,6 @@ const Mycontent = () => {
   const tagsToDisplay = cleanMediaTags(selectedRow?.mediaTags);
 
   console.log('selected content', selectedRow);
-  
-  const deleteImage = async (imageId) => {
-    try {
-      const res = await axios.delete(
-        `https://aicteck-mern-app.onrender.com/api/v1/content/${imageId}`
-      );
-      if (res.status === 200) {
-        toast.success('Media deleted successfully!', { autoClose: 3000 });
-        getContentData(); // Refresh content list
-      }
-    } catch (error) {
-      console.error('Error deleting media:', error);
-      toast.error('Failed to delete media. Please try again.', {
-        autoClose: 3000,
-      });
-    }
-  };
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0); // New state for tracking current media index
-
-  // ... other functions
-
-  const handleNext = () => {
-    if (
-      selectedRow?.images &&
-      currentMediaIndex < selectedRow.images.length - 1
-    ) {
-      setCurrentMediaIndex(currentMediaIndex + 1);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentMediaIndex > 0) {
-      setCurrentMediaIndex(currentMediaIndex - 1);
-    }
-  };
 
   const images = selectedRow?.images;
 
@@ -332,14 +300,19 @@ const Mycontent = () => {
             {/* Update Button */}
             <div className='flex justify-end mt-4 mb-4'>
               <button
+                disabled={loading}
                 onClick={() => setEditModalOpen(false)}
-                className='bg-gray-200 px-4 py-2 rounded-lg mr-2'>
+                className={`bg-gray-200 px-4 py-2 rounded-lg mr-2 ${
+                  loading ? 'cursor-not-allowed opacity-70' : ''
+                }`}>
                 Back
               </button>
               <button
                 onClick={() => updateContent(selectedRow)}
-                className='bg-green-600 text-white px-4 py-2 rounded-lg'>
-                {loading ? 'Loading...' : 'Update'}
+                className={`bg-green-600 text-white px-4 py-2 rounded-lg mr-3 ${
+                  loading ? 'cursor-not-allowed opacity-70' : ''
+                }`}>
+                {loading ? <LoadingSpinner /> : 'Update'}
               </button>
             </div>
           </div>
@@ -397,6 +370,7 @@ const Mycontent = () => {
             headers={headers}
             rows={listContent}
             handleClick={handleOpenModal}
+            loading={loading}
           />{' '}
           {isModalOpen && (
             <EditModal isOpen={isModalOpen} onClose={handleCloseModal}>

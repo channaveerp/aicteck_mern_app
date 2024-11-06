@@ -69,3 +69,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.nodatafound {
+  transform: translate(-50%, -50%);
+}
